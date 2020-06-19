@@ -1,0 +1,23 @@
+{
+  "name": "fb-food-diary-bot",
+  "version": "1.0.0",
+  "description": "A trivial Facebook Messenger bot to keep track of a nutrition diary",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sainnr/fb-food-diary-bot.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/sainnr/fb-food-diary-bot/issues"
+  },
+  "homepage": "https://github.com/sainnr/fb-food-diary-bot#readme",
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "express": "^4.17.1"
+  }
+}
