@@ -1,3 +1,5 @@
+const messagingService = require('../services/messagingService')
+
 module.exports = (req, res) => {
   const body = req.body
   console.log(body)
@@ -12,9 +14,9 @@ module.exports = (req, res) => {
       console.log('Sender ID: ' + senderPsid)
 
       if (webhookEvent.message) {
-        // handleMessage(senderPsid, webhookEvent.message)
+        messagingService.handleMessage(senderPsid, webhookEvent.message)
       } else if (webhookEvent.postback) {
-        // handlePostback(senderPsid, webhookEvent.postback)
+        messagingService.handlePostback(senderPsid, webhookEvent.postback)
       }
 
     })
