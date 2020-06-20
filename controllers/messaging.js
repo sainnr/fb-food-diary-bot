@@ -8,7 +8,8 @@ module.exports = (req, res) => {
     body.entry.forEach(function(entry) {
 
       const webhookEvent = entry.messaging[0]
-      console.log(webhookEvent)
+      console.log('Got event:')
+      console.log(JSON.stringify(webhookEvent))
 
       const senderPsid = webhookEvent.sender.id
       console.log('Sender ID: ' + senderPsid)
