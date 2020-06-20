@@ -1,41 +1,62 @@
+const queryService = require('./queryService')
+
 const getIntent = (possibleIntents) => {
-  return 'save_meal'
+  if (!possibleIntents || !possibleIntents.length) {
+    return 'empty_intent'
+  }
+  const candidate = possibleIntents[0]
+  if (candidate.confidence < 0.7) {
+    return `low_confidence:${candidate.name}`
+  }
+  return candidate.name
 }
 
 const getDish = (entities) => {
-  return 'pizza'
+  const dish = entities["dish:dish"]
+  if (!dish || !dish.length) {
+    return 'empty_dish'
+  }
+  const candidate = dish[0]
+  if (candidate.confidence < 0.7) {
+    return `low_confidence:${candidate.value}`
+  }
+  return candidate.value
 }
 
 const getMeal = (entities) => {
-  return 'lunch'
+  const meal = entities["meal:meal"]
+  if (!meal || !meal.length) {
+    return 'empty_meal'
+  }
+  const candidate = meal[0]
+  if (candidate.confidence < 0.7) {
+    return `low_confidence:${candidate.value}`
+  }
+  return candidate.value
 }
 
-const getRange = (entities) => {
-  return 'day'
-}
-
-const findDish = (dishName) => {
-  // TODO: query known dish by name
-  return {
-    name: dishName,
-    calories: 100,
+const daysInRange = (range) => {
+  if (range === 'day') {
+    return 0
+  } else if (range === 'yesterday') {
+    return 1
+  } else if (range === 'week') {
+    return 7
+  } else {
+    return -1
   }
 }
 
-const saveMeal = (psid, dish, meal) => {
-  console.log(`Command: save meal, ${dish}, ${meal} for ${psid}`)
-  // TODO: save to db
-}
-
-const getSummary = (psid, range) => {
-  console.log(`Command: get summary, ${range} for ${psid}`)
-  // TODO: decode range and query for summary
-
-  const mockSummary = [
-    { meal: 'breakfast', dish: 'sandwich', calories: 200 },
-    { meal: 'lunch', dish: 'salad', calories: 150 },
-  ]
-  return dailySummaryMessage(mockSummary)
+const getRange = (entities) => {
+  const range = entities["range:range"]
+  if (!range || !range.length) {
+    return 'empty_range'
+  }
+  const candidate = range[0]
+  if (candidate.confidence < 0.7) {
+    return `low_confidence:${candidate.value}`
+  }
+  return candidate.value
 }
 
 const dailySummaryMessage = (summary) => {
@@ -50,19 +71,20 @@ module.exports = {
     if (mainIntent === 'save_meal') {
       const mainDish = getDish(entities)
       const mainMeal = getMeal(entities)
-      const dish = findDish(mainDish)
 
-      saveMeal(psid, dish, mainMeal)
+      const dish = queryService.findDish(mainDish)
+      queryService.saveMeal(psid, dish, mainMeal)
 
-      return `Saved as ${dish.name}, that's around ${dish.calories} calories.`
+      return `Saved your ${mainMeal} meal as ${dish.name}, that's around ${dish.calories} calories.`
     } else if (mainIntent === 'show_summary') {
       const mainRange = getRange(entities)
 
-      const msg = getSummary(psid, mainRange)
+      const summary = queryService.rangeSummary(psid, daysInRange(mainRange))
 
-      return msg
+      return dailySummaryMessage(summary)
     } else {
-      console.log(`What should I do with this: ${ mainIntent }`)
+      console.error(`What should I do with this: ${ mainIntent }`)
+      return 'Sorry, no idea what to do with this...'
     }
   },
 
