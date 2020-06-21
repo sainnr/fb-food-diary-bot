@@ -60,8 +60,17 @@ const getRange = (entities) => {
 }
 
 const dailySummaryMessage = (summary) => {
-  const lines = summary.map(line => `${line.meal}: ${line.dish} (${line.calories})\n`)
-  return 'You are doing good today!\n'.concat(lines)
+  if (!summary) {
+    return 'Nothing in the diary for this date interval.'
+  }
+  let calSum = 0
+  const lines = summary.map((line, idx) => {
+    calSum += line.dishCalories
+    return ` ${idx + 1}/ ${line.meal}: ${line.dishName} (${line.dishCalories} kcal) \n `;
+  })
+  lines.push(`\nThat's about ${calSum} kcal in total.`)
+
+  return 'You are doing good today!\n\n'.concat(lines)
 }
 
 module.exports = {

@@ -12,6 +12,7 @@ const dishes = {
   'beef': { name: 'beef steak', calories: 600 },
   'chicken': { name: 'chicken breasts', calories: 400 },
   'pork': { name: 'roasted pork', calories: 700 },
+  'cake': { name: 'piece of cake', calories: 270 },
 }
 
 const diary = {}
@@ -49,6 +50,9 @@ module.exports = {
   rangeSummary: (psid, range) => {
     const dateFrom = fromBeginning(range)
     const entries = diary[psid]
+    if (!entries) {
+      return []
+    }
     return entries.filter(line => line.ts > dateFrom)
   }
 }

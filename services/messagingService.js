@@ -1,5 +1,6 @@
 const senderService = require('./senderService')
 const diaryService = require('./diaryService')
+const imageService = require('./imageService')
 
 /**
  * Handle incoming message and decode user's intent.
@@ -24,6 +25,7 @@ module.exports = {
     } else if (receivedMessage.attachments) {
       // TODO: decode attached dish and confirm the rest of data with user (either postback or instant)
       const attachmentUrl = receivedMessage.attachments[0].payload.url
+      imageService.processImage(attachmentUrl)
       response = {
         "attachment": {
           "type": "template",
