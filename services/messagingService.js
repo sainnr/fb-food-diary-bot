@@ -11,7 +11,7 @@ const imageService = require('./imageService')
  * The intent & entities are passed into the command service to process the command further and generate an outcome.
  * */
 module.exports = {
-  handleMessage: (senderPsid, receivedMessage) => {
+  handleMessage: async (senderPsid, receivedMessage) => {
     let response
 
     // handle text to ask for picture, or create a postback with an image link
@@ -23,36 +23,40 @@ module.exports = {
         "text": result
       }
     } else if (receivedMessage.attachments) {
-      // TODO: decode attached dish and confirm the rest of data with user (either postback or instant)
       const attachmentUrl = receivedMessage.attachments[0].payload.url
-      imageService.processImage(attachmentUrl)
-      response = {
-        "attachment": {
-          "type": "template",
-          "payload": {
-            "template_type": "generic",
-            "elements": [{
-              "title": "Is this the right picture?",
-              "subtitle": "Tap a button to answer.",
-              "image_url": attachmentUrl,
-              "buttons": [
-                {
-                  "type": "postback",
-                  "title": "Yes!",
-                  "payload": "yes",
-                },
-                {
-                  "type": "postback",
-                  "title": "No!",
-                  "payload": "no",
-                }
-              ],
-            }]
+      const result = await imageService.recogniseUrl(attachmentUrl)
+      if (result) {
+        response = {
+          "attachment": {
+            "type": "template",
+            "payload": {
+              "template_type": "generic",
+              "elements": [{
+                "title": `Look like ${result.name}, add to the diary?`,
+                "subtitle": `Should be about ${result.calories} kcal.`,
+                "image_url": attachmentUrl,
+                "buttons": [
+                  {
+                    "type": "postback",
+                    "title": "Yes!",
+                    "payload": "yes",
+                  },
+                  {
+                    "type": "postback",
+                    "title": "No!",
+                    "payload": "no",
+                  }
+                ],
+              }]
+            }
           }
+        }
+      } else {
+        response = {
+          "text": 'Sorry, no idea what it is. Can you please try another picture?'
         }
       }
     }
-
     senderService.sendResponse(senderPsid, response);
   },
 
@@ -67,7 +71,6 @@ module.exports = {
     } else if (payload === 'no') {
       response = { "text": "Oops, try sending another image." }
     }
-
     senderService.sendResponse(senderPsid, response)
   }
 }

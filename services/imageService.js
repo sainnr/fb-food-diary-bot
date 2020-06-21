@@ -63,7 +63,7 @@ module.exports = {
       .then(() => processFromFile(path))
   },
 
-  download: (url, path) => downloadToFile(url, path),
-  processImage: (path) => processFromFile(path),
+  // download: (url, path) => downloadToFile(url, path),
+  // processImage: (path) => processFromFile(path),
   getMainDish: (raw) => mainDish(raw)
 }
