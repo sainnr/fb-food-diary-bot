@@ -37,13 +37,13 @@ const getMeal = (entities) => {
 
 const daysInRange = (range) => {
   if (range === 'day') {
-    return 0
-  } else if (range === 'yesterday') {
     return 1
+  } else if (range === 'yesterday') {
+    return 2
   } else if (range === 'week') {
     return 7
   } else {
-    return -1
+    return 0
   }
 }
 
@@ -64,32 +64,35 @@ const dailySummaryMessage = (summary) => {
     return 'Nothing in the diary for this date interval.'
   }
   let calSum = 0
-  const lines = summary.map((line, idx) => {
+  const lines = ['You are doing good today!\n\n']
+  summary.forEach((line, idx) => {
     calSum += line.dishCalories
-    return ` ${idx + 1}/ ${line.meal}: ${line.dishName} (${line.dishCalories} kcal) \n `;
+    lines.push( `${idx + 1}/ ${line.meal}: ${line.dishName} (${line.dishCalories} kcal) \n`)
   })
   lines.push(`\nThat's about ${calSum} kcal in total.`)
 
-  return 'You are doing good today!\n\n'.concat(lines)
+  return lines.join(" ")
 }
 
 module.exports = {
-  processIntent: (psid, possibleIntents, entities) => {
+  processIntent: async (psid, possibleIntents, entities) => {
     const mainIntent = getIntent(possibleIntents)
 
     if (mainIntent === 'save_meal') {
       const mainDish = getDish(entities)
       const mainMeal = getMeal(entities)
 
-      const dish = queryService.findDish(mainDish)
-      queryService.saveMeal(psid, dish, mainMeal)
+      // one could refactor this some day
+      const dish = await queryService.findDish(mainDish)
+      await queryService.saveMeal(psid, dish, mainMeal)
 
       return `Saved your ${mainMeal} meal as ${dish.name}, that's around ${dish.calories} calories.`
     } else if (mainIntent === 'show_summary') {
       const mainRange = getRange(entities)
 
-      const summary = queryService.rangeSummary(psid, daysInRange(mainRange))
+      const summary = await queryService.rangeSummary(psid, daysInRange(mainRange))
 
+      // next time: support nice formatting for weekly as well
       return dailySummaryMessage(summary)
     } else {
       console.error(`What should I do with this: ${ mainIntent }`)

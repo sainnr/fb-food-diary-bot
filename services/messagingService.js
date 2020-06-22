@@ -34,7 +34,7 @@ module.exports = {
     if (receivedMessage.text) {
       const intents = receivedMessage.nlp.intents
       const entities = receivedMessage.nlp.entities
-      const result = diaryService.processIntent(senderPsid, intents, entities)
+      const result = await diaryService.processIntent(senderPsid, intents, entities)
       response = {
         "text": result
       }

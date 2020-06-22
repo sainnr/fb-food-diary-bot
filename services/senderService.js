@@ -14,7 +14,7 @@ module.exports = {
     axios.post('https://graph.facebook.com/v2.6/me/messages', requestBody, {
       params: { "access_token": PAGE_ACCESS_TOKEN }
     }).then((resp) => {
-      console.log(`Message sent! Code ${resp}`)
+      console.log(`Message sent!`)
     }).catch((err) => {
       console.error("Unable to send message: " + err)
     })

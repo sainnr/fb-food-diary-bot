@@ -2,7 +2,7 @@ const messagingService = require('../services/messagingService')
 
 module.exports = (req, res) => {
   const body = req.body
-  console.log(body)
+  // console.log(body)
 
   if (body.object === 'page') {
     body.entry.forEach(function(entry) {
