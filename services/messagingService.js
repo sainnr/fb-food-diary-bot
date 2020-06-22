@@ -1,6 +1,10 @@
 const senderService = require('./senderService')
 const diaryService = require('./diaryService')
 const imageService = require('./imageService')
+const queryService = require('./queryService')
+
+const serialize = (obj) => Buffer.from(JSON.stringify(obj)).toString('base64')
+const deserialize = (b) => JSON.parse(Buffer.from(b, 'base64'))
 
 /**
  * Handle incoming message and decode user's intent.
@@ -11,10 +15,22 @@ const imageService = require('./imageService')
  * The intent & entities are passed into the command service to process the command further and generate an outcome.
  * */
 module.exports = {
+  handleQuickReply: (senderPsid, receivedMessage) => {
+    const payload = deserialize(receivedMessage.quick_reply.payload)
+    const dish = {
+      name: payload.dishName,
+      calories: payload.dishCalories,
+    }
+    queryService.saveMeal(senderPsid, dish, payload.meal)
+    const response = {
+      "text": `Thanks! Saved your ${payload.meal} meal as ${dish.name}, that's around ${dish.calories} calories.`
+    }
+    senderService.sendResponse(senderPsid, response);
+  },
+
   handleMessage: async (senderPsid, receivedMessage) => {
     let response
 
-    // handle text to ask for picture, or create a postback with an image link
     if (receivedMessage.text) {
       const intents = receivedMessage.nlp.intents
       const entities = receivedMessage.nlp.entities
@@ -26,6 +42,12 @@ module.exports = {
       const attachmentUrl = receivedMessage.attachments[0].payload.url
       const result = await imageService.recogniseUrl(attachmentUrl)
       if (result) {
+        const payload = (answer) => serialize({
+          answer,
+          dishName: result.name,
+          dishCalories: result.calories,
+        })
+        // console.log(payload("test"))
         response = {
           "attachment": {
             "type": "template",
@@ -38,13 +60,13 @@ module.exports = {
                 "buttons": [
                   {
                     "type": "postback",
-                    "title": "Yes!",
-                    "payload": "yes",
+                    "title": "Add to the diary",
+                    "payload": payload("yes"),
                   },
                   {
                     "type": "postback",
-                    "title": "No!",
-                    "payload": "no",
+                    "title": "Forget it",
+                    "payload": payload("no"),
                   }
                 ],
               }]
@@ -53,7 +75,7 @@ module.exports = {
         }
       } else {
         response = {
-          "text": 'Sorry, no idea what it is. Can you please try another picture?'
+          "text": "Sorry, couldn't digest this. Please make sure the image is 550x550px and contains food."
         }
       }
     }
@@ -61,15 +83,41 @@ module.exports = {
   },
 
   handlePostback: (senderPsid, receivedPostback) => {
-    // console.log('ok')
+    // console.log(receivedPostback.payload)
+    const payload = deserialize(receivedPostback.payload, 'base64')
+    const answer = payload.answer
+    // console.log(payload)
     let response
-    // console.log(receivedPostback)
-    const payload = receivedPostback.payload
 
-    if (payload === 'yes') {
-      response = { "text": "Thanks!" }
-    } else if (payload === 'no') {
-      response = { "text": "Oops, try sending another image." }
+    if (answer === 'yes') {
+      const mealPayload = (meal) => serialize({
+        ...payload,
+        meal
+      })
+      response = {
+        "text": "What was the mealtime?",
+        "quick_replies": [
+          {
+            "content_type": "text",
+            "title": "Breakfast",
+            "payload": mealPayload("breakfast"),
+          }, {
+            "content_type": "text",
+            "title": "Lunch",
+            "payload": mealPayload("lunch"),
+          }, {
+            "content_type": "text",
+            "title": "Dinner",
+            "payload": mealPayload("dinner"),
+          }, {
+            "content_type": "text",
+            "title": "snack",
+            "payload": mealPayload("snack"),
+          }
+        ]
+      }
+    } else if (answer === 'no') {
+      response = { "text": "No problem." }
     }
     senderService.sendResponse(senderPsid, response)
   }

@@ -14,7 +14,9 @@ module.exports = (req, res) => {
       const senderPsid = webhookEvent.sender.id
       console.log('Sender ID: ' + senderPsid)
 
-      if (webhookEvent.message) {
+      if (webhookEvent.message && webhookEvent.message.quick_reply) {
+        messagingService.handleQuickReply(senderPsid, webhookEvent.message)
+      } else if (webhookEvent.message) {
         messagingService.handleMessage(senderPsid, webhookEvent.message)
       } else if (webhookEvent.postback) {
         messagingService.handlePostback(senderPsid, webhookEvent.postback)
