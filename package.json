@@ -4,6 +4,7 @@
   "description": "A trivial Facebook Messenger bot to keep track of a nutrition diary",
   "main": "index.js",
   "scripts": {
+    "start": "node index.js",
     "test": "mocha"
   },
   "repository": {
