@@ -24,17 +24,17 @@ How Was Your Lunch is completely integrated into Facebook Pages & Messenger, so 
 
 The complex but amusing technology layer of NLP and imaging AI is kept completely transparent to a user, exposing only a natural language communication.
 
-![Submitting a picture](https://res.cloudinary.com/dntumlq4w/video/upload/e_loop/v1593014846/food/IMG_1027_wtvbkz.gif)
+![Submitting a picture](https://res.cloudinary.com/dntumlq4w/video/upload/e_loop/v1593014846/food/IMG_1027_ygmnky.gif)
 
 ### Messenger API
 Facebook Messenger creates the foundation for the How Was Your Lunch app, connecting it with the user that came to the Facebook page of How Was Your Lunch. Apart from text messages processing and a seamlessly integrated NLP Layer (see below), How Was Your Lunch uses template messages with button replies. It also relies on Quick Replies functionality to instantly ask for the mealtime, when user wants to add a dish from the picture.
 
-![Submitting a meal with text](https://res.cloudinary.com/dntumlq4w/video/upload/e_loop/v1593014846/food/IMG_1022_wtvbkz.gif)
+![Submitting a meal with text](https://res.cloudinary.com/dntumlq4w/video/upload/e_loop/v1593014846/food/IMG_1022_sfua4j.gif)
 
 ### NLP layer
 How Was Your Lunch relies on the Wit.Ai platform to understand users intent, be it saving a meal or asking for summary. It is aware of several common dishes and can grow to learn more. With Wit.Ai, the app extracts mealtimes (automatic assignment based on the current time -- to come) and creates a structured summary, if asked for today, yesterday or for the entire week.
 
-![Asking for a summary](https://res.cloudinary.com/dntumlq4w/video/upload/e_loop/v1593014846/food/IMG_1023_wtvbkz.gif)
+![Asking for a summary](https://res.cloudinary.com/dntumlq4w/video/upload/e_loop/v1593014846/food/IMG_1023_ichcgh.gif)
 
 ### Image recognition layer
 The app integrates with an outstanding image processing service that performs recognition. So when the user shares a photo, it gets forwarded for ML recognition which in turn results in the details about the dish, including calories & nutrition facts. For demo purposes, it temporarily uses [caloriemama.ai sample API](http://caloriemama.ai/api) which has certain limitations but can be replaced with the real one.
